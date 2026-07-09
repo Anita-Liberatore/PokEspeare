@@ -1,6 +1,7 @@
 package com.pokespeare.controller;
 
 import com.pokespeare.dto.PokemonResponse;
+import com.pokespeare.exception.PokemonNotFoundException;
 import com.pokespeare.service.PokemonService;
 import com.pokespeare.service.TranslationService;
 import org.junit.jupiter.api.Test;
@@ -11,11 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PokemonController.class)
-class PokemonControllerTest {
+class PokemonTranslatedControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,30 +28,24 @@ class PokemonControllerTest {
     private TranslationService translationService;
 
     @Test
-    void getPokemon_shouldReturnPokemonResponse() throws Exception {
-        PokemonResponse response = new PokemonResponse(
-                "mewtwo",
-                "It was created by a scientist after years of horrific gene splicing.",
-                "rare",
-                true
-        );
-        when(pokemonService.getPokemon("mewtwo")).thenReturn(response);
+    void shouldReturnTranslatedPokemon() throws Exception {
+        when(translationService.getTranslated("mewtwo"))
+                .thenReturn(new PokemonResponse("mewtwo", "Yoda translated text", "rare", true));
 
-        mockMvc.perform(get("/pokemon/mewtwo"))
-                .andDo(print())
+        mockMvc.perform(get("/pokemon/translated/mewtwo"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("mewtwo"))
-                .andExpect(jsonPath("$.description").value("It was created by a scientist after years of horrific gene splicing."))
+                .andExpect(jsonPath("$.description").value("Yoda translated text"))
                 .andExpect(jsonPath("$.habitat").value("rare"))
                 .andExpect(jsonPath("$.isLegendary").value(true));
     }
 
     @Test
-    void getPokemon_whenNotFound_shouldReturn404() throws Exception {
-        when(pokemonService.getPokemon("unknown")).thenThrow(new com.pokespeare.exception.PokemonNotFoundException("unknown"));
+    void shouldReturn404WhenPokemonNotFound() throws Exception {
+        when(translationService.getTranslated("unknownmon"))
+                .thenThrow(new PokemonNotFoundException("unknownmon"));
 
-        mockMvc.perform(get("/pokemon/unknown"))
-                .andDo(print())
+        mockMvc.perform(get("/pokemon/translated/unknownmon"))
                 .andExpect(status().isNotFound());
     }
 }

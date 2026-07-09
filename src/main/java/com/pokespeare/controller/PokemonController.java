@@ -2,6 +2,7 @@ package com.pokespeare.controller;
 
 import com.pokespeare.dto.PokemonResponse;
 import com.pokespeare.service.PokemonService;
+import com.pokespeare.service.TranslationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PokemonController {
 
     private final PokemonService pokemonService;
+    private final TranslationService translationService;
 
-    public PokemonController(PokemonService pokemonService) {
+    public PokemonController(PokemonService pokemonService, TranslationService translationService) {
         this.pokemonService = pokemonService;
+        this.translationService = translationService;
     }
 
     @GetMapping("/{name}")
@@ -39,5 +42,21 @@ public class PokemonController {
             @Parameter(description = "Pokémon name (e.g. mewtwo)", example = "mewtwo")
             @PathVariable String name) {
         return ResponseEntity.ok(pokemonService.getPokemon(name));
+    }
+
+    @GetMapping("/translated/{name}")
+    @Operation(
+            summary = "Get Pokémon with translated description",
+            description = "Returns Pokémon info with description translated to Yoda style (legendary or cave habitat) or Shakespearean style (others). Falls back to standard description if translation is unavailable.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Pokémon found",
+                            content = @Content(schema = @Schema(implementation = PokemonResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Pokémon not found", content = @Content)
+            }
+    )
+    public ResponseEntity<PokemonResponse> getTranslatedPokemon(
+            @Parameter(description = "Pokémon name (e.g. pikachu)", example = "pikachu")
+            @PathVariable String name) {
+        return ResponseEntity.ok(translationService.getTranslated(name));
     }
 }
