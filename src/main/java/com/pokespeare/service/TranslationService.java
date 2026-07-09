@@ -1,8 +1,6 @@
 package com.pokespeare.service;
 
 import com.pokespeare.client.FunTranslationsClient;
-import com.pokespeare.client.PokeApiClient;
-import com.pokespeare.client.dto.SpeciesResponse;
 import com.pokespeare.dto.PokemonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,54 +12,30 @@ public class TranslationService {
 
     private static final Logger log = LoggerFactory.getLogger(TranslationService.class);
 
-    private final PokeApiClient pokeApiClient;
+    private final PokemonService pokemonService;
     private final FunTranslationsClient funTranslationsClient;
 
-    public TranslationService(PokeApiClient pokeApiClient, FunTranslationsClient funTranslationsClient) {
-        this.pokeApiClient = pokeApiClient;
+    public TranslationService(PokemonService pokemonService, FunTranslationsClient funTranslationsClient) {
+        this.pokemonService = pokemonService;
         this.funTranslationsClient = funTranslationsClient;
     }
 
     @Cacheable("translations")
     public PokemonResponse getTranslated(String name) {
-        SpeciesResponse species = pokeApiClient.getSpecies(name);
-        String description = extractEnglishDescription(species);
-
-        String translated = attemptTranslation(description, species);
-        return buildResponse(species, translated);
+        PokemonResponse pokemon = pokemonService.getPokemon(name);
+        String translated = attemptTranslation(pokemon);
+        return new PokemonResponse(pokemon.name(), translated, pokemon.habitat(), pokemon.isLegendary());
     }
 
-    private String extractEnglishDescription(SpeciesResponse species) {
-        return species.flavorTextEntries().stream()
-                .filter(e -> "en".equals(e.language().name()))
-                .map(SpeciesResponse.FlavorTextEntry::flavorText)
-                .map(text -> text.replace("\n", " ").replace("\f", " "))
-                .findFirst()
-                .orElse("");
-    }
-
-    private String attemptTranslation(String description, SpeciesResponse species) {
-        boolean useYoda = species.isLegendary() || "cave".equals(habitatName(species));
+    private String attemptTranslation(PokemonResponse pokemon) {
+        boolean useYoda = pokemon.isLegendary() || "cave".equals(pokemon.habitat());
         try {
             return useYoda
-                    ? funTranslationsClient.toYoda(description)
-                    : funTranslationsClient.toShakespeare(description);
+                    ? funTranslationsClient.toYoda(pokemon.description())
+                    : funTranslationsClient.toShakespeare(pokemon.description());
         } catch (Exception e) {
             log.warn("Translation failed, falling back to standard description: {}", e.getMessage());
-            return description;
+            return pokemon.description();
         }
-    }
-
-    private String habitatName(SpeciesResponse species) {
-        return species.habitat() != null ? species.habitat().name() : null;
-    }
-
-    private PokemonResponse buildResponse(SpeciesResponse species, String description) {
-        return new PokemonResponse(
-                species.name(),
-                description,
-                habitatName(species),
-                species.isLegendary()
-        );
     }
 }

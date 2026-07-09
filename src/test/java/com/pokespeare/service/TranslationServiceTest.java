@@ -1,16 +1,12 @@
 package com.pokespeare.service;
 
 import com.pokespeare.client.FunTranslationsClient;
-import com.pokespeare.client.PokeApiClient;
-import com.pokespeare.client.dto.SpeciesResponse;
 import com.pokespeare.dto.PokemonResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,7 +16,7 @@ import static org.mockito.Mockito.*;
 class TranslationServiceTest {
 
     @Mock
-    private PokeApiClient pokeApiClient;
+    private PokemonService pokemonService;
 
     @Mock
     private FunTranslationsClient funTranslationsClient;
@@ -28,20 +24,13 @@ class TranslationServiceTest {
     @InjectMocks
     private TranslationService translationService;
 
-    private SpeciesResponse speciesResponse(String name, String habitat, boolean legendary) {
-        return new SpeciesResponse(
-                name,
-                legendary,
-                habitat != null ? new SpeciesResponse.Habitat(habitat) : null,
-                List.of(new SpeciesResponse.FlavorTextEntry(
-                        "Standard description.",
-                        new SpeciesResponse.Language("en")))
-        );
+    private PokemonResponse pokemon(String name, String habitat, boolean legendary) {
+        return new PokemonResponse(name, "Standard description.", habitat, legendary);
     }
 
     @Test
     void shouldUseYodaTranslationForLegendaryPokemon() {
-        when(pokeApiClient.getSpecies("mewtwo")).thenReturn(speciesResponse("mewtwo", "rare", true));
+        when(pokemonService.getPokemon("mewtwo")).thenReturn(pokemon("mewtwo", "rare", true));
         when(funTranslationsClient.toYoda("Standard description.")).thenReturn("Yoda text, this is.");
 
         PokemonResponse result = translationService.getTranslated("mewtwo");
@@ -53,7 +42,7 @@ class TranslationServiceTest {
 
     @Test
     void shouldUseYodaTranslationForCaveHabitatPokemon() {
-        when(pokeApiClient.getSpecies("zubat")).thenReturn(speciesResponse("zubat", "cave", false));
+        when(pokemonService.getPokemon("zubat")).thenReturn(pokemon("zubat", "cave", false));
         when(funTranslationsClient.toYoda("Standard description.")).thenReturn("In cave, lives it.");
 
         PokemonResponse result = translationService.getTranslated("zubat");
@@ -65,7 +54,7 @@ class TranslationServiceTest {
 
     @Test
     void shouldUseShakespeareTranslationForRegularPokemon() {
-        when(pokeApiClient.getSpecies("pikachu")).thenReturn(speciesResponse("pikachu", "forest", false));
+        when(pokemonService.getPokemon("pikachu")).thenReturn(pokemon("pikachu", "forest", false));
         when(funTranslationsClient.toShakespeare("Standard description.")).thenReturn("Shakespearean text.");
 
         PokemonResponse result = translationService.getTranslated("pikachu");
@@ -77,7 +66,7 @@ class TranslationServiceTest {
 
     @Test
     void shouldFallbackToStandardDescriptionWhenTranslationFails() {
-        when(pokeApiClient.getSpecies("pikachu")).thenReturn(speciesResponse("pikachu", "forest", false));
+        when(pokemonService.getPokemon("pikachu")).thenReturn(pokemon("pikachu", "forest", false));
         when(funTranslationsClient.toShakespeare(anyString())).thenThrow(new RuntimeException("rate limited"));
 
         PokemonResponse result = translationService.getTranslated("pikachu");
@@ -87,7 +76,7 @@ class TranslationServiceTest {
 
     @Test
     void shouldFallbackWhenYodaTranslationFails() {
-        when(pokeApiClient.getSpecies("mewtwo")).thenReturn(speciesResponse("mewtwo", "rare", true));
+        when(pokemonService.getPokemon("mewtwo")).thenReturn(pokemon("mewtwo", "rare", true));
         when(funTranslationsClient.toYoda(anyString())).thenThrow(new RuntimeException("rate limited"));
 
         PokemonResponse result = translationService.getTranslated("mewtwo");

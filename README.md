@@ -7,7 +7,7 @@ A Spring Boot REST API that returns Pokémon descriptions rewritten in Shakespea
 ## Tech Stack
 
 - Java 17
-- Spring Boot 3.3
+- Spring Boot 3.4.1
 - Maven
 - Docker
 
