@@ -53,6 +53,15 @@ curl http://localhost:8080/pokemon/pikachu
 
 ---
 
+## API Documentation
+
+Interactive API docs are available via Swagger UI once the application is running:
+
+- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
+- **OpenAPI JSON**: `http://localhost:8080/v3/api-docs`
+
+---
+
 ## Run locally (without Docker)
 
 ### Prerequisites
