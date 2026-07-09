@@ -1,6 +1,6 @@
 # PokEspeare
 
-A Spring Boot REST API that returns Pokémon descriptions rewritten in Shakespearean style.
+A Spring Boot REST API that returns Pokémon information with fun translated descriptions Yoda style for legendary or cave Pokémon, Shakespearean style for everyone else.
 
 ---
 
@@ -60,7 +60,13 @@ GET /pokemon/mewtwo
 }
 ```
 
-**Response `404 Not Found`** when the Pokémon name does not exist.
+**Response `404 Not Found`** when the Pokémon name does not exist. Error handling is managed via a Spring `@RestControllerAdvice` that returns a consistent error body:
+
+```json
+{
+  "error": "Pokemon not found: unknownmon"
+}
+```
 
 ---
 
@@ -86,7 +92,13 @@ GET /pokemon/translated/mewtwo
 }
 ```
 
-**Response `404 Not Found`** when the Pokémon name does not exist.
+**Response `404 Not Found`** when the Pokémon name does not exist. Same error format as above:
+
+```json
+{
+  "error": "Pokemon not found: unknownmon"
+}
+```
 
 ---
 
