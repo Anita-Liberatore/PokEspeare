@@ -1,10 +1,10 @@
 # PokEspeare
 
-REST API Spring Boot che restituisce la descrizione di un Pokémon riscritta in stile shakespeariano.
+A Spring Boot REST API that returns Pokémon descriptions rewritten in Shakespearean style.
 
 ---
 
-## Stack
+## Tech Stack
 
 - Java 17
 - Spring Boot 3.3
@@ -13,25 +13,25 @@ REST API Spring Boot che restituisce la descrizione di un Pokémon riscritta in 
 
 ---
 
-## Avvio con Docker
+## Run with Docker
 
-### Prerequisiti
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installato e in esecuzione
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
 
-### Comandi
+### Commands
 
 ```bash
-# Clona il repository
+# Clone the repository
 git clone https://github.com/Anita-Liberatore/PokEspeare.git
 cd PokEspeare
 
-# Build e avvio
+# Build and start
 docker compose up --build
 ```
 
-L'API sarà disponibile su `http://localhost:8080`.
+The API will be available at `http://localhost:8080`.
 
-Per fermare il container:
+To stop the container:
 
 ```bash
 docker compose down
@@ -41,11 +41,11 @@ docker compose down
 
 ## Endpoint
 
-| Metodo | Path | Descrizione |
+| Method | Path | Description |
 |--------|------|-------------|
-| GET | `/pokemon/{name}` | Restituisce la descrizione shakespeariana del Pokémon |
+| GET | `/pokemon/{name}` | Returns the Shakespearean description of the given Pokémon |
 
-### Esempio
+### Example
 
 ```bash
 curl http://localhost:8080/pokemon/pikachu
@@ -53,9 +53,9 @@ curl http://localhost:8080/pokemon/pikachu
 
 ---
 
-## Avvio locale (senza Docker)
+## Run locally (without Docker)
 
-### Prerequisiti
+### Prerequisites
 - Java 17+
 - Maven 3.9+
 
@@ -65,7 +65,7 @@ mvn spring-boot:run
 
 ---
 
-## Test
+## Tests
 
 ```bash
 mvn test
