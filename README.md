@@ -148,3 +148,9 @@ This implementation is intentionally designed as a demo for a low DAU scenario (
 - **Contract testing**: Since this service is strongly coupled to two external APIs (PokeAPI and FunTranslations), contract tests (e.g. with Pact) would be valuable to verify that the expected response structure from those APIs has not changed. Unit tests with mocks guarantee the internal logic but would not catch a breaking change in an external API contract.
 
 - **Translation strategy**: The current implementation handles two translation types (Yoda and Shakespeare) with a straightforward conditional, which is perfectly adequate for this scope. If the number of translation models were to grow significantly, each with its own selection rules, fallback behaviour or API contract, the preferred approach would be to introduce a **Strategy Pattern**: each translator would implement a common interface, and a resolver would select the appropriate strategy at runtime based on the Pokémon's attributes. This would keep each translator isolated, independently testable and easy to extend without modifying existing logic.
+
+---
+
+## Commit Style
+
+This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification. Each commit is prefixed with a type that describes the nature of the change: `feat` for new features, `fix` for bug fixes, `refactor` for code changes that neither fix a bug nor add a feature, `docs` for documentation updates, `chore` for build or tooling changes, and `test` for test-related changes.
